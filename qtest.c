@@ -294,6 +294,7 @@ static bool queue_remove(position_t pos, int argc, char *argv[])
      * is_remove_head_const() can not pass dudect on Apple M1 (based on Arm64).
      * We shall figure out the exact reasons and resolve later.
      */
+
 #if !(defined(__aarch64__) && defined(__APPLE__))
     if (simulation) {
         if (argc != 1) {
