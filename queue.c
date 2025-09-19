@@ -111,9 +111,9 @@ int q_size(struct list_head *head)
         return 0;
 
     int len = 0;
-    struct list_head *li;
+    struct list_head *run;
 
-    list_for_each(li, head)
+    list_for_each(run, head)
         len++;
     return len;
 }
@@ -121,17 +121,57 @@ int q_size(struct list_head *head)
 /* Delete the middle node in queue */
 bool q_delete_mid(struct list_head *head)
 {
-    // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
+    if (head == NULL || list_empty(head))
+        return false;
+
+    struct list_head *fast = head->next;
+    struct list_head *slow = head->next;
+    while (fast != head && fast->next != head) {
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+
+    list_del(slow);
+    q_release_element(list_entry(slow, element_t, list));
+
     return true;
 }
 
 /* Delete all nodes that have duplicate string */
 bool q_delete_dup(struct list_head *head)
 {
-    // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
+    if (head == NULL || list_empty(head))
+        return false;
+
+    struct list_head *cur = head->next;
+    struct list_head *run = cur->next;
+
+    while (cur != head) {
+        bool duplicate = false;
+        while (run != head &&
+               strcmp(list_entry(cur, element_t, list)->value,
+                      (list_entry(run, element_t, list)->value))) {
+            duplicate = true;
+            struct list_head *tmp = run;
+            run = run->next;
+            list_del(tmp);
+            q_release_element(list_entry(tmp, element_t, list));
+        }
+
+        if (duplicate) {
+            struct list_head *tmp = cur;
+            cur = run;
+            list_del(tmp);
+            q_release_element(list_entry(tmp, element_t, list));
+        } else {
+            cur = run;
+        }
+
+        if (cur != run)
+            run = cur->next;
+    }
     return true;
 }
-
 /* Swap every two adjacent nodes */
 void q_swap(struct list_head *head)
 {
@@ -158,16 +198,16 @@ int q_ascend(struct list_head *head)
     return 0;
 }
 
-/* Remove every node which has a node with a strictly greater value anywhere to
- * the right side of it */
+/* Remove every node which has a node with a strictly greater value anywhere
+ * to the right side of it */
 int q_descend(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
     return 0;
 }
 
-/* Merge all the queues into one sorted queue, which is in ascending/descending
- * order */
+/* Merge all the queues into one sorted queue, which is in
+ * ascending/descending order */
 int q_merge(struct list_head *head, bool descend)
 {
     // https://leetcode.com/problems/merge-k-sorted-lists/
